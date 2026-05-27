@@ -1,173 +1,134 @@
-// 2. Сетка товаров с parallax эффектом и прилипанием
+// 2. Сетка товаров с эффектом TikTok/Reels
 Site.registerWidget('product-grid', (data) => {
     const settings = data.widget_settings?.product_grid || {};
     const title = settings.title || 'Наши товары';
     const products = data.products || [];
-    const limit = settings.limit || 8;
     
     return `
-        <div class="widget product-grid parallax-section">
-            <h2 class="section-title" style="text-align: center; margin-bottom: 60px; font-size: 42px; background: linear-gradient(135deg, #1a1a2e, #0066cc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${title}</h2>
+        <div class="widget product-grid">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 40px; font-size: 32px;">${title}</h2>
             
-            <div class="parallax-container" style="
+            <div class="reels-container" style="
+                height: 70vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                scroll-snap-type: y mandatory;
+                border-radius: 24px;
                 position: relative;
-                height: 600px;
-                overflow-x: auto;
-                overflow-y: visible;
-                perspective: 1000px;
-                padding: 40px 0;
-                margin: 0 -20px;
             ">
-                <div class="parallax-track" style="
-                    display: flex;
-                    gap: 30px;
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    will-change: transform;
-                    padding: 0 20px;
-                ">
-                    ${products.slice(0, limit).map((product, index) => `
-                        <div class="parallax-card" data-id="${product.id}" data-depth="${0.2 + index * 0.05}" style="
-                            width: 280px;
-                            flex-shrink: 0;
+                ${products.map((product, index) => `
+                    <div class="reels-card" data-id="${product.id}" data-index="${index}" style="
+                        scroll-snap-align: start;
+                        height: 70vh;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: relative;
+                        transform: scale(0.6);
+                        opacity: 0;
+                        transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+                    ">
+                        <div class="card-inner" style="
+                            width: 85%;
+                            max-width: 500px;
                             background: white;
-                            border-radius: 24px;
+                            border-radius: 32px;
                             overflow: hidden;
-                            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-                            cursor: pointer;
-                            position: relative;
-                            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-                            transform: translateY(${index * 15}px) scale(${1 - index * 0.03});
-                            opacity: ${1 - index * 0.07};
-                            z-index: ${products.length - index};
+                            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                            transform-origin: center;
+                            transition: all 0.4s ease;
                         ">
-                            <div class="parallax-card-inner" style="
+                            <div class="card-image" style="
+                                height: 50vh;
+                                background: linear-gradient(135deg, ${getGradientColor(index)});
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
                                 position: relative;
-                                transition: all 0.3s ease;
                             ">
-                                <div class="product-badge" style="
-                                    position: absolute;
-                                    top: 15px;
-                                    right: 15px;
-                                    background: ${index === 0 ? '#ff6600' : '#0066cc'};
-                                    color: white;
-                                    padding: 6px 14px;
-                                    border-radius: 30px;
-                                    font-size: 12px;
-                                    font-weight: 600;
-                                    z-index: 10;
-                                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                                ">${index === 0 ? '🔥 Хит' : index === 1 ? '⭐ Новинка' : index === 2 ? '💰 Скидка' : '✓ В наличии'}</div>
-                                
-                                <div class="product-image-parallax" style="
-                                    height: 280px;
-                                    background: linear-gradient(135deg, ${getGradientColor(index)});
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    position: relative;
-                                    overflow: hidden;
-                                ">
-                                    <div style="
-                                        font-size: 80px;
-                                        transition: transform 0.4s ease;
-                                        filter: drop-shadow(0 8px 12px rgba(0,0,0,0.1));
-                                    ">${getProductIcon(product.id)}</div>
-                                    <div class="price-tag" style="
-                                        position: absolute;
-                                        bottom: 15px;
-                                        left: 15px;
-                                        background: rgba(255,255,255,0.95);
-                                        backdrop-filter: blur(10px);
-                                        padding: 8px 16px;
-                                        border-radius: 40px;
-                                        font-weight: bold;
-                                        font-size: 20px;
-                                        color: #0066cc;
-                                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                    ">${product.price.toLocaleString()} ₽</div>
+                                <div style="font-size: 100px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));">
+                                    ${getProductIcon(product.id)}
                                 </div>
+                                <div class="price-badge" style="
+                                    position: absolute;
+                                    bottom: 20px;
+                                    right: 20px;
+                                    background: rgba(255,255,255,0.95);
+                                    backdrop-filter: blur(10px);
+                                    padding: 12px 20px;
+                                    border-radius: 40px;
+                                    font-weight: bold;
+                                    font-size: 24px;
+                                    color: #0066cc;
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                ">${product.price.toLocaleString()} ₽</div>
+                            </div>
+                            
+                            <div class="card-info" style="padding: 24px;">
+                                <h3 style="
+                                    font-size: 24px;
+                                    margin: 0 0 12px 0;
+                                    color: #1a1a2e;
+                                    font-weight: 700;
+                                ">${product.title}</h3>
                                 
-                                <div class="product-info-parallax" style="
-                                    padding: 20px;
-                                    background: white;
-                                ">
-                                    <h3 style="
-                                        font-size: 18px;
-                                        margin: 0 0 8px 0;
-                                        color: #1a1a2e;
-                                        font-weight: 600;
-                                    ">${product.title}</h3>
-                                    <p style="
-                                        font-size: 13px;
-                                        color: #666;
-                                        margin-bottom: 16px;
-                                        line-height: 1.4;
-                                        opacity: 0.8;
-                                    ">${product.description?.substring(0, 80) || 'Стильная модель, отлично подходит для повседневной носки.'}...</p>
-                                    
-                                    <button class="add-to-cart-parallax" data-id="${product.id}" style="
-                                        width: 100%;
+                                <p style="
+                                    font-size: 14px;
+                                    color: #666;
+                                    line-height: 1.5;
+                                    margin-bottom: 20px;
+                                ">${product.description || 'Стильная модель, отлично подходит для повседневной носки. Высокое качество и современный дизайн.'}</p>
+                                
+                                <div style="display: flex; gap: 12px;">
+                                    <button class="add-to-cart-reels" data-id="${product.id}" style="
+                                        flex: 2;
                                         background: linear-gradient(135deg, #0066cc, #0052a3);
                                         color: white;
                                         border: none;
-                                        padding: 12px;
+                                        padding: 14px;
                                         border-radius: 40px;
-                                        font-size: 14px;
+                                        font-size: 16px;
                                         font-weight: 600;
                                         cursor: pointer;
-                                        transition: all 0.3s ease;
-                                        position: relative;
-                                        overflow: hidden;
+                                        transition: all 0.3s;
                                     ">
-                                        <span class="btn-text">📦 Добавить в корзину</span>
-                                        <span class="btn-hover" style="
-                                            position: absolute;
-                                            top: 0;
-                                            left: -100%;
-                                            width: 100%;
-                                            height: 100%;
-                                            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-                                            transition: left 0.5s;
-                                        "></span>
+                                        📦 В корзину
+                                    </button>
+                                    <button class="like-btn" data-id="${product.id}" style="
+                                        flex: 0;
+                                        background: #f0f0f0;
+                                        border: none;
+                                        width: 50px;
+                                        border-radius: 40px;
+                                        font-size: 20px;
+                                        cursor: pointer;
+                                        transition: all 0.3s;
+                                    ">
+                                        ♡
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    `).join('')}
-                </div>
+                    </div>
+                `).join('')}
             </div>
             
-            <div class="parallax-controls" style="
-                text-align: center;
-                margin-top: 40px;
-                display: flex;
-                justify-content: center;
-                gap: 20px;
+            <div class="scroll-progress" style="
+                position: fixed;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                background: rgba(0,0,0,0.1);
+                border-radius: 4px;
+                z-index: 100;
             ">
-                <button class="parallax-nav prev" style="
-                    background: #1a1a2e;
-                    color: white;
-                    border: none;
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                    font-size: 20px;
-                ">←</button>
-                <button class="parallax-nav next" style="
-                    background: #1a1a2e;
-                    color: white;
-                    border: none;
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                    font-size: 20px;
-                ">→</button>
+                <div class="scroll-progress-bar" style="
+                    width: 100%;
+                    background: #0066cc;
+                    border-radius: 4px;
+                    transition: height 0.1s;
+                "></div>
             </div>
         </div>
     `;
@@ -175,17 +136,17 @@ Site.registerWidget('product-grid', (data) => {
 
 function getGradientColor(index) {
     const gradients = [
-        '#f5f7fa 0%, #e9ecef 100%',
-        '#ffe6e6 0%, #ffcccc 100%',
-        '#e6f3ff 0%, #cce6ff 100%',
-        '#f0e6ff 0%, #e0ccff 100%',
-        '#e6ffe6 0%, #ccffcc 100%',
-        '#fff0e6 0%, #ffe0cc 100%'
+        '#667eea 0%, #764ba2 100%',
+        '#f093fb 0%, #f5576c 100%',
+        '#4facfe 0%, #00f2fe 100%',
+        '#fa709a 0%, #fee140 100%',
+        '#a18cd1 0%, #fbc2eb 100%',
+        '#ff9a9e 0%, #fecfef 100%'
     ];
     return gradients[index % gradients.length];
 }
 
 function getProductIcon(productId) {
-    const icons = { 1: '👕', 2: '👖', 3: '👟', 4: '👔', 5: '🧥', 6: '👞' };
-    return icons[productId] || '👕';
+    const icons = { 1: '👕', 2: '👖', 3: '👟', 4: '👔', 5: '🧥', 6: '👞', 7: '👗', 8: '🧣' };
+    return icons[productId] || '🛍️';
 }
