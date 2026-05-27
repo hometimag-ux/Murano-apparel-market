@@ -92,3 +92,89 @@
         padding: 4px 12px !important;
     }
 }
+/* TikTok/Reels стиль для товаров */
+.reels-container {
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.reels-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.reels-container::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
+.reels-container::-webkit-scrollbar-thumb {
+    background: #0066cc;
+    border-radius: 4px;
+}
+
+.reels-card {
+    scroll-snap-align: start;
+    transition: all 0.2s ease-out;
+}
+
+.reels-card.active {
+    transform: scale(1) !important;
+    opacity: 1 !important;
+}
+
+.reels-card.active .card-inner {
+    transform: scale(1);
+}
+
+.card-inner {
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+/* Анимация лайка */
+@keyframes likeAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); color: #ff3366; }
+    100% { transform: scale(1); color: #ff3366; }
+}
+
+.like-btn.liked {
+    animation: likeAnimation 0.3s ease;
+    background: #ffe6ea;
+}
+
+.like-btn.liked {
+    color: #ff3366;
+}
+
+/* Прогресс скролла */
+.scroll-progress {
+    pointer-events: none;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .reels-container {
+        height: 80vh;
+    }
+    
+    .reels-card {
+        height: 80vh;
+    }
+    
+    .card-image {
+        height: 45vh !important;
+    }
+    
+    .card-image div {
+        font-size: 70px !important;
+    }
+    
+    .price-badge {
+        font-size: 18px !important;
+        padding: 8px 16px !important;
+    }
+    
+    .card-info h3 {
+        font-size: 18px !important;
+    }
+}
