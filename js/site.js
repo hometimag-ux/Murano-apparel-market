@@ -1,50 +1,8 @@
-// Дополнительная логика сайта (слайдеры, анимации)
-document.addEventListener('DOMContentLoaded', () => {
-    // Простая логика слайдера (будет улучшена позже)
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.slide');
-    const prevBtn = document.querySelector('.slider-prev');
-    const nextBtn = document.querySelector('.slider-next');
-    
-    function showSlide(index) {
-        if (!slides.length) return;
-        if (index < 0) index = slides.length - 1;
-        if (index >= slides.length) index = 0;
-        slides.forEach((slide, i) => {
-            slide.style.display = i === index ? 'block' : 'none';
-        });
-        currentSlide = index;
-    }
-    
-    if (prevBtn) prevBtn.onclick = () => showSlide(currentSlide - 1);
-    if (nextBtn) nextBtn.onclick = () => showSlide(currentSlide + 1);
-    showSlide(0);
-    
-    // Фильтр по категориям
-    const categoryCards = document.querySelectorAll('.category-card');
-    categoryCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const categoryId = card.dataset.category;
-            // Простая фильтрация (можно улучшить)
-            alert(`Фильтр по категории ${categoryId} (будет реализовано)`);
-        });
-    });
-    
-    // Подписка
-    const subscribeForm = document.getElementById('subscribe-form');
-    if (subscribeForm) {
-        subscribeForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = subscribeForm.querySelector('input').value;
-            alert(`Спасибо за подписку, ${email}!`);
-            subscribeForm.reset();
-        });
-    }
-});
-// Обработчики для 3D-карточек (делегирование событий)
+// Обработчики для 3D-карточек с флип эффектом
 document.addEventListener('click', (e) => {
-    // Добавление в корзину
-    if (e.target.classList.contains('add-to-cart-3d')) {
+    // Добавление в корзину (кнопка на обратной стороне)
+    if (e.target.classList.contains('add-to-cart-flip')) {
+        e.stopPropagation();
         const id = parseInt(e.target.dataset.id);
         if (id) {
             Site.addToCart(id);
@@ -64,31 +22,60 @@ document.addEventListener('click', (e) => {
         }
     }
     
-    // Переход на страницу товара (если кликнули не по кнопке)
-    const card = e.target.closest('.product-card-3d');
-    if (card && !e.target.classList.contains('add-to-cart-3d')) {
-        const id = card.dataset.id;
-        if (id) {
-            // alert(`Страница товара #${id} (будет позже)`);
-            // Здесь позже добавим переход на страницу товара
-        }
+    // Кнопка "Подробнее"
+    if (e.target.classList.contains('view-details')) {
+        e.stopPropagation();
+        const id = parseInt(e.target.dataset.id);
+        alert(`Страница товара #${id} будет здесь позже!`);
     }
 });
 
-// Эффект следования за мышью для 3D-карточек (дополнительный эффект)
-document.addEventListener('mousemove', (e) => {
-    const cards = document.querySelectorAll('.product-card-3d');
-    cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
+// Добавляем иконку корзины, если её нет
+function ensureCartIcon() {
+    if (!document.querySelector('.cart-icon')) {
+        const cartIcon = document.createElement('div');
+        cartIcon.className = 'cart-icon';
+        cartIcon.innerHTML = '🛒 <span class="cart-count">0</span>';
+        cartIcon.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0066cc;
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        `;
+        cartIcon.onclick = () => Site.openCart();
+        document.body.appendChild(cartIcon);
         
-        if (mouseX >= 0 && mouseX <= rect.width && mouseY >= 0 && mouseY <= rect.height) {
-            const rotateX = (mouseY - rect.height / 2) / 20;
-            const rotateY = (mouseX - rect.width / 2) / 20;
-            card.style.transform = `translateY(-12px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        }
-    });
-});
+        // Добавляем счётчик
+        const countSpan = document.createElement('span');
+        countSpan.className = 'cart-count';
+        countSpan.style.cssText = `
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f44336;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+        cartIcon.appendChild(countSpan);
+    }
+}
 
-console.log('🎨 3D-эффекты для карточек товаров активированы');
+// Запускаем добавление иконки
+setTimeout(ensureCartIcon, 100);
