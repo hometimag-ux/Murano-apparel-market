@@ -121,3 +121,84 @@ body {
         padding: 0 16px;
     }
 }
+/* 3D карточки товаров */
+.product-card-3d {
+    transform-style: preserve-3d;
+    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+.product-card-3d:hover {
+    transform: translateY(-12px) rotateX(5deg) rotateY(5deg);
+    box-shadow: 0 30px 40px rgba(0,0,0,0.15), 0 0 0 2px rgba(0,102,204,0.1);
+}
+
+.product-card-3d:hover .product-image-3d {
+    transform: scale(1.02);
+}
+
+.product-card-3d:hover .product-image-3d > div:first-child {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.product-card-3d:hover .product-overlay {
+    opacity: 1;
+}
+
+.product-card-3d:hover .product-overlay button {
+    transform: translateY(0);
+}
+
+.product-card-3d:hover .product-info-3d h3 {
+    color: #0066cc;
+}
+
+.product-card-3d:hover .product-price-3d {
+    transform: scale(1.05);
+}
+
+/* Анимация для карточек при загрузке */
+@keyframes cardFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-card-3d {
+    animation: cardFadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+/* Задержки для каждой карточки */
+.product-card-3d:nth-child(1) { animation-delay: 0.05s; }
+.product-card-3d:nth-child(2) { animation-delay: 0.1s; }
+.product-card-3d:nth-child(3) { animation-delay: 0.15s; }
+.product-card-3d:nth-child(4) { animation-delay: 0.2s; }
+.product-card-3d:nth-child(5) { animation-delay: 0.25s; }
+.product-card-3d:nth-child(6) { animation-delay: 0.3s; }
+
+/* Стили для кнопки добавления в корзину */
+.add-to-cart-3d {
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-3d:hover {
+    transform: scale(1.05) !important;
+    background: #0066cc !important;
+    color: white !important;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .product-card-3d:hover {
+        transform: translateY(-8px) rotateX(0deg) rotateY(0deg);
+    }
+    
+    .products-grid {
+        gap: 20px !important;
+    }
+}
