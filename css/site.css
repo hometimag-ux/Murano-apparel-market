@@ -1,162 +1,30 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background: #fff;
-    color: #1a1a2e;
-    line-height: 1.5;
-}
-
-.site-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Зоны для виджетов */
-.widget-zone {
-    min-height: 50px;
-}
-
-/* Общие стили для виджетов */
-.widget {
-    margin-bottom: 40px;
-}
-
-/* Корзина */
-.cart-icon {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    background: #0066cc;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 100;
-    transition: transform 0.2s;
-}
-
-.cart-icon:hover {
-    transform: scale(1.05);
-}
-
-.cart-count {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #f44336;
-    color: white;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Модальное окно */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal.active {
-    display: flex;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 20px;
-    padding: 24px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.close {
-    float: right;
-    font-size: 28px;
-    cursor: pointer;
-}
-
-.btn-primary {
-    background: #0066cc;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s;
-}
-
-.btn-primary:hover {
-    background: #0052a3;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .site-container {
-        padding: 0 16px;
-    }
-}
-/* 3D карточки товаров */
+/* 3D-флип карточки товаров */
 .product-card-3d {
-    transform-style: preserve-3d;
-    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    background: transparent;
+    perspective: 1000px;
 }
 
-.product-card-3d:hover {
-    transform: translateY(-12px) rotateX(5deg) rotateY(5deg);
-    box-shadow: 0 30px 40px rgba(0,0,0,0.15), 0 0 0 2px rgba(0,102,204,0.1);
+.product-card-3d:hover .flip-card-inner {
+    transform: rotateY(180deg);
 }
 
-.product-card-3d:hover .product-image-3d {
-    transform: scale(1.02);
+.flip-card-inner {
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.product-card-3d:hover .product-image-3d > div:first-child {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.product-card-3d:hover .product-overlay {
-    opacity: 1;
-}
-
-.product-card-3d:hover .product-overlay button {
-    transform: translateY(0);
-}
-
-.product-card-3d:hover .product-info-3d h3 {
-    color: #0066cc;
-}
-
-.product-card-3d:hover .product-price-3d {
+/* Стили для кнопок на обратной стороне */
+.add-to-cart-flip:hover {
     transform: scale(1.05);
+    background: #ff6600 !important;
+    color: white !important;
 }
 
-/* Анимация для карточек при загрузке */
+.view-details:hover {
+    background: white !important;
+    color: #0066cc !important;
+}
+
+/* Анимация появления карточек */
 @keyframes cardFadeInUp {
     from {
         opacity: 0;
@@ -173,7 +41,6 @@ body {
     opacity: 0;
 }
 
-/* Задержки для каждой карточки */
 .product-card-3d:nth-child(1) { animation-delay: 0.05s; }
 .product-card-3d:nth-child(2) { animation-delay: 0.1s; }
 .product-card-3d:nth-child(3) { animation-delay: 0.15s; }
@@ -181,24 +48,25 @@ body {
 .product-card-3d:nth-child(5) { animation-delay: 0.25s; }
 .product-card-3d:nth-child(6) { animation-delay: 0.3s; }
 
-/* Стили для кнопки добавления в корзину */
-.add-to-cart-3d {
-    transition: all 0.3s ease;
-}
-
-.add-to-cart-3d:hover {
-    transform: scale(1.05) !important;
-    background: #0066cc !important;
-    color: white !important;
-}
-
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
-    .product-card-3d:hover {
-        transform: translateY(-8px) rotateX(0deg) rotateY(0deg);
+    .product-card-3d {
+        height: 380px !important;
     }
     
-    .products-grid {
-        gap: 20px !important;
+    .flip-card-front .product-image {
+        height: 200px !important;
+    }
+    
+    .flip-card-back {
+        padding: 15px !important;
+    }
+    
+    .flip-card-back h3 {
+        font-size: 18px !important;
+    }
+    
+    .flip-card-back .product-price {
+        font-size: 22px !important;
     }
 }
