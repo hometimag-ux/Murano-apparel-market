@@ -181,3 +181,8 @@ window.updateSiteData = function(newData) {
 
 Site.init();
 window.Site = Site;
+
+// Сохранение данных
+Site.saveData = function() {
+    localStorage.setItem('murano_site_data', JSON.stringify(this.storeData));
+};
