@@ -1,6 +1,6 @@
 // Site Core — загрузка виджетов и управление данными
 window.Site = {
-    // Данные магазина (позже будет загружаться из CRM)
+    // Данные магазина
     storeData: {
         shop: { name: 'Murano Apparel', phone: '+7 (999) 123-45-67', email: 'info@murano.ru' },
         products: [
@@ -15,9 +15,7 @@ window.Site = {
             { id: 1, title: 'Одежда', slug: 'clothing' },
             { id: 2, title: 'Обувь', slug: 'shoes' }
         ],
-        // Настройки виджетов
         widget_settings: {},
-        // Какие виджеты в каких зонах
         widget_zones: {
             header: ['header-banner'],
             main: ['promo-slider', 'category-list', 'product-grid'],
@@ -25,39 +23,39 @@ window.Site = {
         }
     },
 
-    // Зарегистрированные виджеты
     widgets: {},
-
-    // Корзина
     cart: [],
 
-    // Инициализация
     init: function() {
+        console.log('🟢 Site.init() запущен');
         this.loadData();
         this.renderZones();
         this.initCart();
     },
 
     loadData: function() {
-        // Загружаем сохранённые настройки из localStorage
         const saved = localStorage.getItem('murano_site_data');
         if (saved) {
             try {
                 const data = JSON.parse(saved);
                 this.storeData = { ...this.storeData, ...data };
-            } catch(e) {}
+                console.log('📀 Данные загружены из localStorage');
+            } catch(e) { console.error('Ошибка загрузки данных', e); }
         }
     },
 
     saveData: function() {
         localStorage.setItem('murano_site_data', JSON.stringify(this.storeData));
+        console.log('💾 Данные сохранены');
     },
 
     registerWidget: function(name, renderFn) {
         this.widgets[name] = renderFn;
+        console.log(`✅ Виджет зарегистрирован: ${name}`);
     },
 
     renderZones: function() {
+        console.log('🟢 Рендеринг зон');
         for (const [zone, widgets] of Object.entries(this.storeData.widget_zones)) {
             const zoneElement = document.getElementById(`zone-${zone}`);
             if (zoneElement) {
@@ -65,13 +63,15 @@ window.Site = {
                 for (const widgetName of widgets) {
                     if (this.widgets[widgetName]) {
                         html += `<div class="widget" data-widget="${widgetName}">${this.widgets[widgetName](this.storeData)}</div>`;
+                    } else {
+                        console.warn(`⚠️ Виджет не найден: ${widgetName}`);
                     }
                 }
                 zoneElement.innerHTML = html;
+            } else {
+                console.warn(`⚠️ Зона не найдена: zone-${zone}`);
             }
         }
-        
-        // Добавляем иконку корзины
         this.addCartIcon();
     },
 
@@ -123,23 +123,30 @@ window.Site = {
 
     openCart: function() {
         const modal = document.getElementById('cart-modal');
+        if (!modal) {
+            console.warn('Модальное окно корзины не найдено');
+            return;
+        }
+        
         const cartItemsDiv = document.getElementById('cart-items');
         const cartTotalDiv = document.querySelector('.cart-total');
         
+        if (!cartItemsDiv) return;
+        
         if (this.cart.length === 0) {
             cartItemsDiv.innerHTML = '<p>Корзина пуста</p>';
-            cartTotalDiv.innerHTML = '';
+            if (cartTotalDiv) cartTotalDiv.innerHTML = '';
         } else {
             cartItemsDiv.innerHTML = this.cart.map(item => `
-                <div class="cart-item">
+                <div class="cart-item" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                     <span>${item.title}</span>
                     <span>${item.price} ₽ × ${item.quantity}</span>
-                    <span>${item.price * item.quantity} ₽</span>
-                    <button onclick="Site.removeFromCart(${item.id})">🗑️</button>
+                    <span>${(item.price * item.quantity).toLocaleString()} ₽</span>
+                    <button onclick="Site.removeFromCart(${item.id})" style="background:none; border:none; color:#f44336; cursor:pointer;">🗑️</button>
                 </div>
             `).join('');
             const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            cartTotalDiv.innerHTML = `<strong>Итого: ${total.toLocaleString()} ₽</strong>`;
+            if (cartTotalDiv) cartTotalDiv.innerHTML = `<strong>Итого: ${total.toLocaleString()} ₽</strong>`;
         }
         
         modal.classList.add('active');
@@ -149,40 +156,43 @@ window.Site = {
         this.cart = this.cart.filter(item => item.id != productId);
         this.saveCart();
         this.updateCartCount();
-        this.openCart(); // обновляем модалку
+        this.openCart();
     },
 
     initCart: function() {
+        console.log('🟢 Инициализация корзины');
         this.loadCart();
         
-        // Закрытие модалки
         const modal = document.getElementById('cart-modal');
-        const closeBtn = modal.querySelector('.close');
-        closeBtn.onclick = () => modal.classList.remove('active');
-        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+        if (!modal) {
+            console.warn('Модальное окно корзины не найдено, пропускаем инициализацию');
+            return;
+        }
         
-        // Оформление заказа
-        document.getElementById('checkout-btn').onclick = () => {
-            if (this.cart.length === 0) {
-                alert('Корзина пуста');
-                return;
-            }
-            alert('Форма оформления заказа будет здесь. Заявка отправится в CRM!');
-        };
+        const closeBtn = modal.querySelector('.close');
+        if (closeBtn) {
+            closeBtn.onclick = () => modal.classList.remove('active');
+        }
+        
+        const checkoutBtn = document.getElementById('checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.onclick = () => {
+                if (this.cart.length === 0) {
+                    alert('Корзина пуста');
+                    return;
+                }
+                alert('Форма оформления заказа будет здесь. Заявка отправится в CRM!');
+            };
+        }
+        
+        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
     }
 };
 
-// Функция для обновления данных (будет использоваться админкой)
-window.updateSiteData = function(newData) {
-    Site.storeData = { ...Site.storeData, ...newData };
-    Site.saveData();
-    Site.renderZones();
-};
+// Автозапуск после загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🟢 DOM загружен, запускаем Site.init()');
+    Site.init();
+});
 
-Site.init();
 window.Site = Site;
-
-// Сохранение данных
-Site.saveData = function() {
-    localStorage.setItem('murano_site_data', JSON.stringify(this.storeData));
-};
