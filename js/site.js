@@ -1,22 +1,41 @@
-// Простые обработчики для карточек
+// Обработчик для кнопки корзины (стабильная версия)
 document.addEventListener('click', (e) => {
-    const addBtn = e.target.closest('.add-to-cart-simple');
+    const addBtn = e.target.closest('.add-to-cart-stable');
     if (addBtn) {
         e.stopPropagation();
         const id = parseInt(addBtn.dataset.id);
         if (id) {
             Site.addToCart(id);
             
-            const originalText = addBtn.innerHTML;
-            addBtn.innerHTML = '✓ Добавлено!';
-            addBtn.style.background = '#4caf50';
-            addBtn.style.color = 'white';
-            
+            // Визуальный отклик
+            addBtn.style.transform = 'scale(0.9)';
             setTimeout(() => {
-                addBtn.innerHTML = originalText;
-                addBtn.style.background = 'white';
-                addBtn.style.color = '#0066cc';
-            }, 1000);
+                addBtn.style.transform = '';
+            }, 150);
+            
+            // Быстрое уведомление (можно через toast)
+            const toast = document.createElement('div');
+            toast.textContent = '✓ Добавлено';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 90px;
+                right: 20px;
+                background: #1a1a2e;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 30px;
+                font-size: 13px;
+                z-index: 1100;
+                opacity: 0;
+                transition: opacity 0.2s;
+                pointer-events: none;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.style.opacity = '1', 10);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 1500);
         }
     }
 });
@@ -31,39 +50,29 @@ function ensureCartIcon() {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #0066cc;
+            background: #1a1a2e;
             color: white;
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 22px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             z-index: 1000;
+            transition: transform 0.2s;
         `;
         cartIcon.onclick = () => Site.openCart();
         document.body.appendChild(cartIcon);
         
-        const countSpan = cartIcon.querySelector('.cart-count');
-        if (countSpan) {
-            countSpan.style.cssText = `
-                position: absolute;
-                top: -8px;
-                right: -8px;
-                background: #f44336;
-                border-radius: 50%;
-                width: 22px;
-                height: 22px;
-                font-size: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-        }
+        cartIcon.addEventListener('mouseenter', () => cartIcon.style.transform = 'scale(1.05)');
+        cartIcon.addEventListener('mouseleave', () => cartIcon.style.transform = 'scale(1)');
     }
 }
 
-setTimeout(ensureCartIcon, 100);
+// Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(ensureCartIcon, 100);
+});
