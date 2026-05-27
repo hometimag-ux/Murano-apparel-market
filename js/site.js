@@ -1,108 +1,69 @@
-// Плавный стэк эффект с Intersection Observer
-function initStackEffect() {
-    const container = document.querySelector('.scroll-stack');
-    const cards = document.querySelectorAll('.stack-card');
-    
-    if (!container || !cards.length) return;
-    
-    // Используем Intersection Observer для определения активной карточки
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            const card = entry.target;
-            const rect = entry.boundingClientRect;
-            const containerRect = container.getBoundingClientRect();
+// Простые обработчики для карточек
+document.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('.add-to-cart-simple');
+    if (addBtn) {
+        e.stopPropagation();
+        const id = parseInt(addBtn.dataset.id);
+        if (id) {
+            Site.addToCart(id);
             
-            // Центр контейнера
-            const containerCenter = containerRect.top + containerRect.height / 2;
-            const cardCenter = rect.top + rect.height / 2;
-            const distance = Math.abs(containerCenter - cardCenter);
-            const maxDistance = containerRect.height / 2;
+            const originalText = addBtn.innerHTML;
+            addBtn.innerHTML = '✓ Добавлено!';
+            addBtn.style.background = '#4caf50';
+            addBtn.style.color = 'white';
             
-            // Масштабирование: 1.05 в центре, 0.85 на краях
-            let scale;
-            if (distance < 50) {
-                scale = 1.05; // Центр
-                card.classList.add('scale-up');
-                card.classList.remove('scale-down');
-            } else {
-                scale = 0.92 - (distance / maxDistance) * 0.1;
-                scale = Math.max(0.85, Math.min(0.92, scale));
-                card.classList.remove('scale-up');
-                card.classList.add('scale-down');
-            }
-            
-            const wrapper = card.querySelector('.card-wrapper');
-            if (wrapper) {
-                wrapper.style.transform = `scale(${scale})`;
-            }
-        });
-    }, {
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        root: container,
-        rootMargin: '0px'
-    });
-    
-    // Наблюдаем за каждой карточкой
-    cards.forEach(card => observer.observe(card));
-    
-    // Плавная прокрутка колесиком
-    let isScrolling = false;
-    let scrollTimeout;
-    
-    container.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? 1 : -1;
-        const currentIndex = findCurrentCardIndex(container, cards);
-        const targetIndex = Math.min(Math.max(0, currentIndex + delta), cards.length - 1);
-        
-        if (!isScrolling && targetIndex !== currentIndex) {
-            isScrolling = true;
-            cards[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                isScrolling = false;
-            }, 500);
+            setTimeout(() => {
+                addBtn.innerHTML = originalText;
+                addBtn.style.background = 'white';
+                addBtn.style.color = '#0066cc';
+            }, 1000);
         }
-    }, { passive: false });
-    
-    function findCurrentCardIndex(container, cards) {
-        const containerRect = container.getBoundingClientRect();
-        let closestIndex = 0;
-        let minDistance = Infinity;
-        
-        cards.forEach((card, index) => {
-            const cardRect = card.getBoundingClientRect();
-            const distance = Math.abs(cardRect.top - containerRect.top);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestIndex = index;
-            }
-        });
-        
-        return closestIndex;
     }
-    
-    // Добавляем обработчик для кнопок корзины
-    document.querySelectorAll('.add-to-cart-stack').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = parseInt(btn.dataset.id);
-            if (id) {
-                Site.addToCart(id);
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '✓ Добавлено!';
-                btn.style.background = '#4caf50';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = '#0066cc';
-                }, 1000);
-            }
-        });
-    });
+});
+
+// Убеждаемся, что иконка корзины есть
+function ensureCartIcon() {
+    if (!document.querySelector('.cart-icon')) {
+        const cartIcon = document.createElement('div');
+        cartIcon.className = 'cart-icon';
+        cartIcon.innerHTML = '🛒 <span class="cart-count">0</span>';
+        cartIcon.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0066cc;
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        `;
+        cartIcon.onclick = () => Site.openCart();
+        document.body.appendChild(cartIcon);
+        
+        const countSpan = cartIcon.querySelector('.cart-count');
+        if (countSpan) {
+            countSpan.style.cssText = `
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background: #f44336;
+                border-radius: 50%;
+                width: 22px;
+                height: 22px;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+        }
+    }
 }
 
-// Запуск
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initStackEffect, 200);
-});
+setTimeout(ensureCartIcon, 100);
