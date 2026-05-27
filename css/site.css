@@ -1,34 +1,56 @@
-/* 3D-флип карточки товаров */
-.product-card-3d {
-    background: transparent;
-    perspective: 1000px;
+/* Parallax лента товаров */
+.parallax-section {
+    overflow: hidden;
+    position: relative;
 }
 
-.product-card-3d:hover .flip-card-inner {
-    transform: rotateY(180deg);
+.parallax-container {
+    scroll-behavior: smooth;
+    cursor: grab;
 }
 
-.flip-card-inner {
-    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+.parallax-container:active {
+    cursor: grabbing;
 }
 
-/* Стили для кнопок на обратной стороне */
-.add-to-cart-flip:hover {
-    transform: scale(1.05);
-    background: #ff6600 !important;
-    color: white !important;
+.parallax-container::-webkit-scrollbar {
+    height: 8px;
 }
 
-.view-details:hover {
-    background: white !important;
-    color: #0066cc !important;
+.parallax-container::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
 }
 
-/* Анимация появления карточек */
-@keyframes cardFadeInUp {
+.parallax-container::-webkit-scrollbar-thumb {
+    background: #0066cc;
+    border-radius: 10px;
+}
+
+/* Эффект прилипания при наведении */
+.parallax-card {
+    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1) !important;
+}
+
+.parallax-card:hover {
+    transform: translateY(-20px) scale(1.05) !important;
+    box-shadow: 0 30px 50px rgba(0,0,0,0.2) !important;
+    z-index: 1000 !important;
+}
+
+.parallax-card:hover .product-image-parallax div {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.parallax-card:hover .add-to-cart-parallax .btn-hover {
+    left: 100%;
+}
+
+/* Анимация появления */
+@keyframes slideFromBottom {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(100px);
     }
     to {
         opacity: 1;
@@ -36,37 +58,37 @@
     }
 }
 
-.product-card-3d {
-    animation: cardFadeInUp 0.6s ease forwards;
-    opacity: 0;
+.parallax-card {
+    animation: slideFromBottom 0.6s ease forwards;
 }
 
-.product-card-3d:nth-child(1) { animation-delay: 0.05s; }
-.product-card-3d:nth-child(2) { animation-delay: 0.1s; }
-.product-card-3d:nth-child(3) { animation-delay: 0.15s; }
-.product-card-3d:nth-child(4) { animation-delay: 0.2s; }
-.product-card-3d:nth-child(5) { animation-delay: 0.25s; }
-.product-card-3d:nth-child(6) { animation-delay: 0.3s; }
+/* Эффект глубины при прокрутке */
+.parallax-track {
+    transition: transform 0.1s linear;
+}
 
-/* Адаптивность для мобильных */
+/* Кнопки навигации */
+.parallax-nav:hover {
+    background: #0066cc !important;
+    transform: scale(1.1);
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
-    .product-card-3d {
-        height: 380px !important;
+    .parallax-card {
+        width: 240px !important;
     }
     
-    .flip-card-front .product-image {
-        height: 200px !important;
+    .product-image-parallax {
+        height: 220px !important;
     }
     
-    .flip-card-back {
-        padding: 15px !important;
+    .product-image-parallax div {
+        font-size: 60px !important;
     }
     
-    .flip-card-back h3 {
-        font-size: 18px !important;
-    }
-    
-    .flip-card-back .product-price {
-        font-size: 22px !important;
+    .price-tag {
+        font-size: 16px !important;
+        padding: 4px 12px !important;
     }
 }
