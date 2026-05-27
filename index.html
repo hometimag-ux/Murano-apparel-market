@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murano Apparel — интернет-магазин одежды</title>
+    <link rel="stylesheet" href="css/site.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Зоны для виджетов -->
+    <div class="site-container">
+        <div id="zone-header" class="widget-zone" data-zone="header"></div>
+        <div id="zone-main" class="widget-zone" data-zone="main"></div>
+        <div id="zone-footer" class="widget-zone" data-zone="footer"></div>
+    </div>
+
+    <!-- Модалка для корзины (будет позже) -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Корзина</h2>
+            <div id="cart-items"></div>
+            <div class="cart-total"></div>
+            <button id="checkout-btn" class="btn-primary">Оформить заказ</button>
+        </div>
+    </div>
+
+    <script src="js/site-core.js"></script>
+    <script src="js/widgets.js"></script>
+    <script src="js/site.js"></script>
+</body>
+</html>
