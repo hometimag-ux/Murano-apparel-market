@@ -41,3 +41,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+// Обработчики для 3D-карточек (делегирование событий)
+document.addEventListener('click', (e) => {
+    // Добавление в корзину
+    if (e.target.classList.contains('add-to-cart-3d')) {
+        const id = parseInt(e.target.dataset.id);
+        if (id) {
+            Site.addToCart(id);
+            
+            // Визуальный фидбек
+            const btn = e.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Добавлено!';
+            btn.style.background = '#4caf50';
+            btn.style.color = 'white';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = 'white';
+                btn.style.color = '#0066cc';
+            }, 1000);
+        }
+    }
+    
+    // Переход на страницу товара (если кликнули не по кнопке)
+    const card = e.target.closest('.product-card-3d');
+    if (card && !e.target.classList.contains('add-to-cart-3d')) {
+        const id = card.dataset.id;
+        if (id) {
+            // alert(`Страница товара #${id} (будет позже)`);
+            // Здесь позже добавим переход на страницу товара
+        }
+    }
+});
+
+// Эффект следования за мышью для 3D-карточек (дополнительный эффект)
+document.addEventListener('mousemove', (e) => {
+    const cards = document.querySelectorAll('.product-card-3d');
+    cards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        if (mouseX >= 0 && mouseX <= rect.width && mouseY >= 0 && mouseY <= rect.height) {
+            const rotateX = (mouseY - rect.height / 2) / 20;
+            const rotateY = (mouseX - rect.width / 2) / 20;
+            card.style.transform = `translateY(-12px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+    });
+});
+
+console.log('🎨 3D-эффекты для карточек товаров активированы');
