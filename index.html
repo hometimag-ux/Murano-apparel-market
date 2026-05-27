@@ -4,32 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Murano Apparel — интернет-магазин одежды</title>
-    <link rel="stylesheet" href="css/site.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: #fff; }
+        .site-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .widget { margin-bottom: 40px; padding: 20px; border: 1px solid #eee; border-radius: 16px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .product-card { border: 1px solid #eee; border-radius: 12px; padding: 16px; text-align: center; }
+        .product-price { color: #0066cc; font-size: 20px; font-weight: bold; margin: 10px 0; }
+        .btn-primary { background: #0066cc; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; }
+        .cart-icon { position: fixed; bottom: 20px; right: 20px; background: #0066cc; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .header-banner { background: #f8f9fa; text-align: center; padding: 12px; border-radius: 8px; }
+    </style>
 </head>
 <body>
-    <!-- Зоны для виджетов -->
     <div class="site-container">
-        <div id="zone-header" class="widget-zone" data-zone="header"></div>
-        <div id="zone-main" class="widget-zone" data-zone="main"></div>
-        <div id="zone-footer" class="widget-zone" data-zone="footer"></div>
+        <div id="zone-header"></div>
+        <div id="zone-main"></div>
+        <div id="zone-footer"></div>
     </div>
+    <div class="cart-icon" onclick="alert('Корзина будет позже')">🛒</div>
 
-    <!-- Модалка для корзины (будет позже) -->
-    <div id="cart-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Корзина</h2>
-            <div id="cart-items"></div>
-            <div class="cart-total"></div>
-            <button id="checkout-btn" class="btn-primary">Оформить заказ</button>
-        </div>
-    </div>
-
-    <script src="js/site-core.js"></script>
-    <script src="js/widgets.js"></script>
-    <script src="js/site.js"></script>
+    <script>
+        // Минимальная версия сайта для проверки
+        const products = [
+            { id: 1, title: 'Футболка', price: 1990 },
+            { id: 2, title: 'Джинсы', price: 3990 },
+            { id: 3, title: 'Кеды', price: 2990 }
+        ];
+        
+        document.getElementById('zone-header').innerHTML = `<div class="header-banner">🏷️ Бесплатная доставка от 3000 ₽</div>`;
+        document.getElementById('zone-main').innerHTML = `
+            <div class="widget">
+                <h2>Наши товары</h2>
+                <div class="products-grid">
+                    ${products.map(p => `
+                        <div class="product-card">
+                            <h3>${p.title}</h3>
+                            <div class="product-price">${p.price.toLocaleString()} ₽</div>
+                            <button class="btn-primary" onclick="alert('Товар добавлен в корзину')">В корзину</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        document.getElementById('zone-footer').innerHTML = `<div class="widget"><p>© 2024 Murano Apparel</p></div>`;
+    </script>
 </body>
 </html>
