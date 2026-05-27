@@ -1,76 +1,76 @@
-// Parallax эффект для ленты товаров
-function initParallax() {
-    const container = document.querySelector('.parallax-container');
-    const track = document.querySelector('.parallax-track');
+// TikTok/Reels эффект для товаров
+function initReelsEffect() {
+    const container = document.querySelector('.reels-container');
+    const cards = document.querySelectorAll('.reels-card');
+    const progressBar = document.querySelector('.scroll-progress-bar');
     
-    if (!container || !track) return;
+    if (!container || !cards.length) return;
     
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-    
-    // Drag to scroll
-    container.addEventListener('mousedown', (e) => {
-        isDown = true;
-        container.style.cursor = 'grabbing';
-        startX = e.pageX - container.offsetLeft;
-        scrollLeft = container.scrollLeft;
-    });
-    
-    container.addEventListener('mouseleave', () => {
-        isDown = false;
-        container.style.cursor = 'grab';
-    });
-    
-    container.addEventListener('mouseup', () => {
-        isDown = false;
-        container.style.cursor = 'grab';
-    });
-    
-    container.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - container.offsetLeft;
-        const walk = (x - startX) * 2;
-        container.scrollLeft = scrollLeft - walk;
-    });
-    
-    // Кнопки навигации
-    const prevBtn = document.querySelector('.parallax-nav.prev');
-    const nextBtn = document.querySelector('.parallax-nav.next');
-    
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            container.scrollBy({ left: -320, behavior: 'smooth' });
-        });
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            container.scrollBy({ left: 320, behavior: 'smooth' });
-        });
-    }
-    
-    // Parallax эффект при прокрутке
-    container.addEventListener('scroll', () => {
-        const cards = document.querySelectorAll('.parallax-card');
-        const scrollPosition = container.scrollLeft;
+    function updateCards() {
+        const containerRect = container.getBoundingClientRect();
+        const containerCenter = containerRect.top + containerRect.height / 2;
         
         cards.forEach((card, index) => {
-            const cardOffset = card.offsetLeft;
-            const depth = parseFloat(card.dataset.depth) || 0.2;
-            const translateY = Math.sin((scrollPosition - cardOffset) * 0.01) * 15 * depth;
-            const rotateY = (scrollPosition - cardOffset) * 0.05 * depth;
+            const cardRect = card.getBoundingClientRect();
+            const cardCenter = cardRect.top + cardRect.height / 2;
+            const distanceFromCenter = Math.abs(containerCenter - cardCenter);
+            const maxDistance = containerRect.height / 2;
             
-            card.style.transform = `translateY(${translateY}px) rotateY(${rotateY}deg)`;
+            // Масштаб от 0.6 до 1 в зависимости от близости к центру
+            let scale = 1 - (distanceFromCenter / maxDistance) * 0.4;
+            scale = Math.max(0.6, Math.min(1, scale));
+            
+            // Прозрачность
+            let opacity = 1 - (distanceFromCenter / maxDistance) * 0.5;
+            opacity = Math.max(0.3, Math.min(1, opacity));
+            
+            // Поворот для 3D эффекта
+            const rotate = (distanceFromCenter / maxDistance) * 5;
+            const direction = cardCenter < containerCenter ? -rotate : rotate;
+            
+            card.style.transform = `scale(${scale})`;
+            card.style.opacity = opacity;
+            card.querySelector('.card-inner').style.transform = `perspective(1000px) rotateX(${direction}deg)`;
+            
+            // Добавляем активный класс для центральной карточки
+            if (Math.abs(distanceFromCenter) < 50) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
         });
+        
+        // Обновляем прогресс скролла
+        if (progressBar) {
+            const scrollPercent = container.scrollTop / (container.scrollHeight - container.clientHeight);
+            const heightPercent = scrollPercent * 100;
+            progressBar.style.height = `${heightPercent}%`;
+        }
+    }
+    
+    // Обработчик скролла с throttle
+    let ticking = false;
+    container.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateCards();
+                ticking = false;
+            });
+            ticking = true;
+        }
     });
+    
+    // Обработчик изменения размера
+    window.addEventListener('resize', updateCards);
+    
+    // Первоначальный запуск
+    setTimeout(updateCards, 100);
 }
 
-// Добавление в корзину с parallax эффектом
+// Добавление в корзину
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.add-to-cart-parallax')) {
-        const btn = e.target.closest('.add-to-cart-parallax');
+    if (e.target.closest('.add-to-cart-reels')) {
+        const btn = e.target.closest('.add-to-cart-reels');
         const id = parseInt(btn.dataset.id);
         
         if (id) {
@@ -87,12 +87,22 @@ document.addEventListener('click', (e) => {
             }, 1000);
         }
     }
+    
+    // Лайк
+    if (e.target.closest('.like-btn')) {
+        const btn = e.target.closest('.like-btn');
+        btn.classList.toggle('liked');
+        
+        if (btn.classList.contains('liked')) {
+            btn.innerHTML = '❤️';
+            // Можно добавить сохранение в избранное
+        } else {
+            btn.innerHTML = '♡';
+        }
+    }
 });
 
-// Запуск parallax после загрузки
+// Запуск
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initParallax, 100);
+    setTimeout(initReelsEffect, 100);
 });
-
-// Обновляем при изменении размера окна
-window.addEventListener('resize', initParallax);
